@@ -161,11 +161,6 @@ if(empty($username)): ?>
 		        <option value="on">Pingbacks Enabled</option>
 		    </select>
 		    </div>
-		    
-		    <div>
-		    <label for="post-author">Post Author Username</label>
-		    <input type="text" id="post-author" name="post-author" value="admin">
-		    </div>
     	</fieldset>
     	<fieldset>
     	    <legend>Ready?</legend>
@@ -274,14 +269,6 @@ if('on' === $_REQUEST["ping-state"]) {
 }
 else {
     $pings = 'closed';
-}
-
-# Override the Author Username
-if(isset($_REQUEST["post-author"]) && !empty($_REQUEST["post-author"])) {
-    $author = $_REQUEST["post-author"];
-}
-else {
-    $author = 'admin';
 }
 
 # OK. Query the Tumblr API for the posts and get them all in 50-post batches:
@@ -440,7 +427,7 @@ ob_start();
 ?>
 		<link><?php echo $post->attributes()->url ?></link>
 		<pubDate><?php echo $post->attributes()->date ?> +0000</pubDate>
-		<dc:creator><![CDATA[<?php echo $author?>]]></dc:creator>
+		<dc:creator><![CDATA[post_author]]></dc:creator>
 		<?php getTags($post) ?>
 		<guid isPermaLink="false"><?php echo $post->attributes()->url ?></guid>
 		<wp:post_id><?php echo $post->attributes()->id ?></wp:post_id>
