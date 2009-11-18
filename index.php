@@ -61,7 +61,7 @@ if(empty($username)): ?>
 			<dd><?php echo T2W_VERSION ?></dd>
 			<dt>Author</dt>
 			<dd class="vcard">
-			    Originally by 
+			    Originally by
 			    <a class="fn url" href="http://haochen.me/">Hao Chen</a>
 			</dd>
 			<dd class="vcard">
@@ -74,10 +74,10 @@ if(empty($username)): ?>
 			<dd><a href="http://github.com/benward/tumblr2wordpress">
 			    github.com/benward/tumblr2wordpress</a></dd>
 		</dl>
-		<p>This tool will create a WordPress compatible XML file from your 
+		<p>This tool will create a WordPress compatible XML file from your
 		    Tumblr blog, which you can then save and import into WordPress.</p>
 		<form method="POST" action="">
-		    
+
 		<fieldset>
 		    <legend>Tumblr Account</legend>
 		    <label for="tumblr-user">Tumblr Blog URL (not your email address or custom domain):</label>
@@ -89,36 +89,36 @@ if(empty($username)): ?>
 		    <p>By default, Tumblr posts are output are converted into HTML,
 		        just as they would be on your Tumblr blog page.</p>
 		    <ul>
-		        <li><input type="radio" name="filter" id="fltr-html" value="html" checked> 
+		        <li><input type="radio" name="filter" id="fltr-html" value="html" checked>
 		            <label for="fltr-html">HTML</label>
 		        </li>
 		        <li><input type="radio" name="filter" id="fltr-text" value="text">
 		            <label for="fltr-text">Plain Text</label>
 		        </li>
-		        <li><input type="radio" name="filter" id="fltr-none"value="none">
+		        <li><input type="radio" name="filter" id="fltr-none" value="none">
 		            <label for="fltr-none">Raw Input (preserving Markdown)</label>
 		        </li>
 		    </ul>
 		</fieldset>
 		<fieldset>
 		    <legend>Permalink Slugs</legend>
-		    <p>Here, choose the permalink format for the posts when they 
+		    <p>Here, choose the permalink format for the posts when they
 		        are imported into Wordpress.</p>
-		    <p>A reliable permalink may allow you to redirect content between 
+		    <p>A reliable permalink may allow you to redirect content between
     		   your old and new site. <a href="#help-permalinks">Read more</a>.</p>
 		    <ul>
-		        <li><input type="radio" name="permaform" id="link-id" value="id" checked> 
-		            <label for="link-id">Use the Tumblr post ID. 
+		        <li><input type="radio" name="permaform" id="link-id" value="id" checked>
+		            <label for="link-id">Use the Tumblr post ID.
 		                e.g. <kbd>http://blog.example.com/posts/<strong>12345678</strong></kbd>
 		            </label>
 		        </li>
-		        <li><input type="radio" name="permaform" id="link-combo" value="combo" checked> 
+		        <li><input type="radio" name="permaform" id="link-combo" value="combo">
 		            <label for="link-combo">Create a combined slug
 		                e.g. <kbd>http://blog.example.com/posts/<strong>12345678-my-blog-post-title</strong></kbd>
 		            </label>
 		        </li>
-		        <li><input type="radio" name="permaform" id="link-orig" value="text"> 
-		            <label for="link-orig">Use original Tumblr text slug only. 
+		        <li><input type="radio" name="permaform" id="link-orig" value="text">
+		            <label for="link-orig">Use original Tumblr text slug only.
 		                e.g. <kbd>http://blog.example.com/posts/<strong>my-blog-post-title-about-stuff</strong></kbd>
 		            </label>
 		        </li>
@@ -145,7 +145,7 @@ if(empty($username)): ?>
 		        <option value="draft">Draft</option>
 		    </select>
 		    </div>
-		    
+
 		    <div>
 		    <label for="comment-state">Comments</label>
 		    <select name="comment-state" id="comment-state">
@@ -153,7 +153,7 @@ if(empty($username)): ?>
 		        <option value="on">Comments Enabled</option>
 		    </select>
 		    </div>
-		    
+
 		    <div>
 		    <label for="ping-state">Pings</label>
 		    <select name="ping-state" id="ping-state">
@@ -185,7 +185,7 @@ if(empty($username)): ?>
 	        post ID in the new permalink slugs, since that way you can redirect
 	        from one to the other.</p>
 	        <p>If you take your current Tumblr custom domain, and host it
-	        yourself, you can set up a simple <samp>.htaccess</samp> redirect 
+	        yourself, you can set up a simple <samp>.htaccess</samp> redirect
 	        for people linking to your old posts:</p>
 	        <pre><code>RewriteEngine On
 RewriteRule ^/?posts/([0-9]+).*$ http://wordpress.example.com/blog/$1</code></pre>
@@ -196,7 +196,7 @@ RewriteRule ^/?posts/([0-9]+).*$ http://wordpress.example.com/blog/$1</code></pr
 		</p>
 	</body>
 </html>
-<?php 
+<?php
   # If we output the form, end now:
   exit();
 endif;
@@ -249,7 +249,7 @@ switch($_REQUEST["publish-state"]) {
     case "draft":
         $publish = 'draft';
         break;
-    case "publish": 
+    case "publish":
     default:
         $publish = 'publish';
         break;
@@ -334,8 +334,8 @@ function getTags($post)
 		echo "<category><![CDATA[Uncategorized]]></category>\n";
 		echo "\t\t<category domain=\"category\" nicename=\"uncategorized\"><![CDATA[Uncategorized]]></category>\n";
 	}
-	if($post->tag) 
-	{ 
+	if($post->tag)
+	{
 		foreach($post->tag as $tag)
 		{
 			echo "\t\t<category domain=\"tag\"><![CDATA[$tag]]></category>\n";
@@ -373,11 +373,71 @@ function formatPermalinkSlug($id, $text) {
     }
 }
 
+# Try to extract a sane, single line blog title from input text, and
+# (optionally) remove it from the entry body to avoid duplication.
+function formatEntryTitle(&$text, $strip=true) {
+    $lines = explode("\n", $text);
+    $block_count = 0; # How far into the entry are we?
+    for($i=0; $l = $lines[$i]; $i++) {
+
+        if(empty($l)) {
+            # Ignoring emptry lines
+            continue;
+        }
+        elseif(preg_match('/^\s*(#+|<[hH][1-6]>).*$/', $l, $match)) {
+            # Matches a heading in Markdown or HTML
+
+            # Now we need to see if the title embeds any links. If it does,
+            # we want to strip out the link mark-up…
+
+            # If raw input:
+            if('none' == $_REQUEST["filter"]) {
+                # Run markdown:
+                if(file_exists("markdown.php")) {
+                    require_once("markdown.php");
+                    $l = Markdown($l);
+                }
+                else {
+                    error_log("Couldn't import Markdown parser");
+                }
+            }
+            # Crudely check for <a>
+            $contains_link = !(false === stripos('<a', $l));
+
+            if( true === $strip
+                && false === $contains_link) {
+                # If there has been no other content so far (allowing one block
+                # for quote attribution), and we're stripping titles out of the
+                # text to avoid duplication, do it:
+                $lines = array_splice($lines, $i, 1);
+                $text = implode('\n', $lines);
+            }
+
+            # In the final return, strip not-inline HTML tags.
+            return str_replace('\n', '', strip_tags(
+                $l,
+                '<abbr><acronym><i><b><strong><em><code><kbd><samp><span><q>
+                 <cite><dfn><ins><del><mark><meter><rp><rt><ruby><sub><sup>
+                 <time><var>'
+            ));
+        }
+        else {
+            $block_count++;
+        }
+
+        if($block_count > 2) {
+            # Too far into the post. Give up.
+            break;
+        }
+    }
+    return '';
+}
+
 header('content-type: text/xml');
 header("content-disposition: attachment; filename=tumblr_$username.xml");
 ?>
 <?php echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"; ?>
-<!-- This is a WordPress eXtended RSS file generated by WordPress as an export of your blog. -->
+<!-- This is a WordPress eXtended RSS file generated from your Tumblr posts. -->
 <!-- It contains information about your blog's posts, comments, and categories. -->
 <!-- You may use this file to transfer that content from one site to another. -->
 <!-- This file is not intended to serve as a complete backup of your blog. -->
@@ -393,7 +453,7 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 <!-- 6. WordPress will then import each of the posts, comments, and categories -->
 <!--    contained in this file into your blog -->
 
-<!-- generator="Tumblr2WordPress/0.2" created="<?php echo date("Y-m-d H:i") ?>"-->
+<!-- generator="Tumblr2WordPress/<?php echo T2W_VERSION ?>" created="<?php echo date("Y-m-d H:i") ?>"-->
 <rss version="2.0"
 	xmlns:content="http://purl.org/rss/1.0/modules/content/"
 	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
@@ -406,7 +466,7 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 	<link>http://<?php echo $feed->tumblelog->attributes()->name ?>.tumblr.com/</link>
 	<description><?php echo $feed->tumblelog ?></description>
 	<pubDate><?php echo date("r") ?></pubDate>
-	<generator>http://<?php echo $_SERVER['HTTP_HOST'] . ' · Tumblr2Wordpress v' . T2W_VERSION ?></generator>
+	<generator>http://<?php echo 'Tumblr2Wordpress/' . T2W_VERSION . '(' . $_SERVER['HTTP_HOST'] . ')' ?></generator>
 	<language>en</language>
 	<wp:wxr_version>1.0</wp:wxr_version>
 	<wp:base_site_url>http://<?php echo $feed->tumblelog->attributes()->name ?>.tumblr.com/</wp:base_site_url>
@@ -416,10 +476,10 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 		<wp:category_parent></wp:category_parent>
 		<wp:cat_name><![CDATA[Uncategorized]]></wp:cat_name>
 	</wp:category>
-<?php 
+<?php
 ob_start();
-	foreach($posts as $post) 
-	{ 
+	foreach($posts as $post)
+	{
 ?>
 	<item>
 <?php
@@ -442,69 +502,99 @@ ob_start();
 		<wp:post_password></wp:post_password>
 <?php
         // Post Specific Elements:
-		switch($post->attributes()->type) 
+		switch($post->attributes()->type)
 		{
 			case "regular": ?>
 	 	<title><?php echo htmlspecialchars($post->{'regular-title'}) ?></title>
 		<description></description>
 		<content:encoded><![CDATA[<?php echo formatForWP($post->{'regular-body'}) ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'regular-title'}) ?></wp:post_name>
-<?php		    break;
-			case "photo": ?>
-	 	<title><?php echo htmlspecialchars(strip_tags($post->{'photo-caption'})) ?></title>
+<?php		break;
+
+
+			case "photo":
+			$post_content = $post->{'photo-caption'};
+
+			?>
+	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
-		<content:encoded><![CDATA[<img src="<?php echo $post->{'photo-url'} ?>" alt=""/>\n\n<?php echo formatForWP($post->{'photo-caption'}) ?>]]></content:encoded>
+		<content:encoded><![CDATA[<img src="<?php echo $post->{'photo-url'} ?>" alt=""/>
+
+		<?php echo formatForWP($post_content) ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'photo-caption'}) ?></wp:post_name>
 <?php
-				break;
-			case "quote": ?>
-	 	<title><?php echo htmlspecialchars(strip_tags($post->{'quote-text'})) ?></title>
+			break;
+
+			case "quote":
+			$post_content = $post->{'quote-source'};
+		?>
+	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
-		<content:encoded><![CDATA[<blockquote><?php echo $post->{'quote-text'} ?></blockquote>\n\n<?php echo formatForWP($post->{'quote-source'}) ?>]]></content:encoded>
+		<content:encoded><![CDATA[<blockquote><?php echo $post->{'quote-text'} ?></blockquote>
+
+		<?php echo formatForWP($post_content) ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, str_replace('&#8220;','',str_replace('&#8221;','',$post->{'quote-text'}))) ?></wp:post_name>
 <?php
-				break;
+			break;
+
 			case "link": ?>
 	 	<title><?php echo htmlspecialchars(strip_tags($post->{'link-text'})) ?></title>
 		<description><?php echo htmlspecialchars(strip_tags($post->{'link-description'})) ?></description>
-		<content:encoded><![CDATA[<a href="<?php echo $post->{'link-url'} ?>"><?php echo $post->{'link-text'} ?></a>\n\n<?php echo formatForWP($post->{'link-description'}) ?>]]></content:encoded>
+		<content:encoded><![CDATA[<a href="<?php echo $post->{'link-url'} ?>"><?php echo $post->{'link-text'} ?></a>
+
+		<?php echo formatForWP($post->{'link-description'}) ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'link-text'}) ?></wp:post_name>
 <?php
-				break;
-		case "conversation": ?>
+			break;
+
+
+		    case "conversation": ?>
 	 	<title><?php echo htmlspecialchars(strip_tags($post->{'conversation-title'})) ?></title>
 		<description></description>
-		<content:encoded><![CDATA[<?php 
+		<content:encoded><![CDATA[<?php
 		    foreach($post->{'conversation-line'} as $line) { ?>
 		        <cite><?php echo $line->attributes()->label ?></cite>
 		        <q><?php echo $line ?></q><br/><?php } ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'conservation-title'}) ?></wp:post_name>
 <?php
-				break;
-			case "video": ?>
-	 	<title><?php echo htmlspecialchars(strip_tags($post->{'video-caption'})) ?></title>
+			break;
+
+
+			case "video":
+			$post_content = $post->{'video-caption'};
+		?>
+	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
-<?php if($type == 'wordpress.com' && strpos($post->{'video-source'}, 'youtube.com') !== false) { ?>
-		<content:encoded><![CDATA[[youtube=<?php echo $post->{'video-source'} ?>]]]></content:encoded>
-<?php }elseif($type == 'wordpress.com' && strpos($post->{'video-source'}, 'video.google.com') !== false) { ?>	
-		<content:encoded><![CDATA[[googlevideo=<?php preg_match('/src="([\S\s]*?)"/', $post->{'video-player'}, $matches); echo $matches[1]; ?>]]]></content:encoded>
-<?php }else{ ?>	
-		<content:encoded><![CDATA[<?php echo $post->{'video-player'} ?>]]></content:encoded>
-<?php } ?>
+		<content:encoded><![CDATA[
+        <?php if($type == 'wordpress.com' && strpos($post->{'video-source'}, 'youtube.com') !== false) { ?>
+		[youtube=<?php echo $post->{'video-source'} ?>]
+        <?php } elseif($type == 'wordpress.com' && strpos($post->{'video-source'}, 'video.google.com') !== false) { ?>
+		[googlevideo=<?php preg_match('/src="([\S\s]*?)"/', $post->{'video-player'}, $matches); echo $matches[1]; ?>]
+        <?php } else { ?>
+	    <?php echo $post->{'video-player'} ?>
+
+	    <?php echo $post_content ?>
+	    ]]></content:encoded>
+        <?php } ?>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'video-caption'}) ?></wp:post_name>
 <?php
-				break;
-			case "audio": ?>
-	 	<title><?php echo htmlspecialchars(strip_tags($post->{'audio-caption'})) ?></title>
+			break;
+
+			case "audio":
+			$post_content = $post->{'audio-caption'};
+		?>
+	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
-		<content:encoded><![CDATA[<a href="<?php preg_match('/audio_file=([\S\s]*?)(&|")/', $post->{'audio-player'}, $matches); echo $matches[1]; ?>"><?php echo $post->{'audio-caption'} ?></a>]]></content:encoded>
+		<content:encoded><![CDATA[<a href="<?php preg_match('/audio_file=([\S\s]*?)(&|")/', $post->{'audio-player'}, $matches); echo $matches[1]; ?>">Audio</a>
+
+		<?php echo $post_content ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'audio-caption'}) ?></wp:post_name>
 <?php
-				break;
+			break;
 		}
 ?>
 	</item>
-<?php 
+<?php
 	}
 	$out = ob_get_contents();
 	ob_end_clean();

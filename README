@@ -3,7 +3,7 @@
 Tumblr2Wordpress is a PHP script to take posts from Tumblr and export them in
 the extended RSS format that Wordpress uses for full-data input/export.
 
-It allows you to take your posts, categories and tags from Tumblr and move 
+It allows you to take your posts, categories and tags from Tumblr and move
 them to Wordpress. Some amount of configuration of publication state and post
 state is supported, as well as control over processing of Markdown syntax
 on the Tumblr side.
@@ -36,6 +36,13 @@ This work is licensed under the GPL v3 <http://www.gnu.org/licenses/gpl.html>
     <q>, rather than <strong> and nothing.
   * Improved the output mark-up for quotes. Quotes is now wrapped in a
     <blockquote> element.
-  * Page header now includes project details, shared author attribution, 
+  * Page header now includes project details, shared author attribution,
     and so forth.
   * Added inline help documentation for why fixing your redirects is useful.
+  * Added a parser to try and extract meaningful post titles where possible.
+    Will take the first heading from early in the content if available, else
+    will return empty titles.
+  * BUGFIX: Captions were not being included for video files.
+  * BUGFIX: Audio links now have text 'Audio'. Caption follows below. This
+    prevents nesting problems if the caption itself contains links elsewhere,
+    or block elements.
