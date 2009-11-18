@@ -582,10 +582,11 @@ ob_start();
 
 			case "audio":
 			$post_content = $post->{'audio-caption'};
+			$audio_file = preg_match('/audio_file=([\S\s]*?)(&|")/', $post->{'audio-player'}, $matches);
 		?>
 	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
-		<content:encoded><![CDATA[<a href="<?php preg_match('/audio_file=([\S\s]*?)(&|")/', $post->{'audio-player'}, $matches); echo $matches[1]; ?>">Audio</a>
+		<content:encoded><![CDATA[<audio controls src="<?php echo $matches[1] ?>"><a href="<?php echo $matches[1]; ?>">Audio</a></audio>
 
 		<?php echo $post_content ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'audio-caption'}) ?></wp:post_name>
