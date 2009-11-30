@@ -2,6 +2,10 @@
 
 define(T2W_VERSION, '0.3-benward');
 
+# Some pieces of content will have to be parsed into HTML where we have to add
+# HTML strucutre (e.g. around conversations)
+require_once("markdown.php");
+
 # Check for valid input
 $username = isset($_REQUEST['username']) && !empty($_REQUEST['username']) ? $_REQUEST['username'] : '';
 
@@ -11,48 +15,7 @@ if(empty($username)): ?>
 	<head>
 	    <meta charset="utf-8">
 		<title>Tumblr2WordPress: Export Your Tumblr To WordPress</title>
-		<style>
-			body {
-			    max-width: 40em;
-			    font: 100%/150% Helvetica, Arial, sans-serif;
-			}
-			h1 {
-			    font-size: 130%;
-			    line-height: 150%;
-			}
-			dl {
-			    font-size: 80%;
-			}
-			dt {
-			    font-weight: bold;
-			}
-			form {
-			    margin: 5px 0;
-			    padding: 0;
-			}
-			fieldset {
-			    border: 0;
-			    -webkit-border-radius: 10px;
-			    -moz-border-radius: 10px;
-			    background-color: #eee;
-			    background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#fff));
-			    border: 3px #2D4261 solid;
-			    padding: 5px 15px;
-			}
-			legend {
-			    font-weight: bold;
-			    padding-top: 2.5em;
-			    margin-left: -2px;
-			}
-			fieldset ul {
-			    list-style-type: none;
-			    margin: 0;
-			    padding: 0;
-			}
-			p.donate {
-			    font-size: 80%;
-			}
-		</style>
+		<link rel="stylesheet" href="t2w.css" type="text/css">
 	</head>
 	<body>
 		<h1>Tumblr2WordPress: Export Your Tumblr to WordPress</h1>
@@ -165,6 +128,13 @@ if(empty($username)): ?>
     	<fieldset>
     	    <legend>Ready?</legend>
 		    <input type="submit" value="Export">
+		    <p>After a short pause, your browser will download an XML file
+		        containing your Tumblr posts, converted for use in Wordpress.
+		        You should open this file in a text editor to see the
+		        instructions on how to import your posts, and also check for
+		        any warnings the exporter has generated for your posts. For
+		        example, you may need to re-upload audio and image files from
+		        your posts.</p>
 		</fieldset>
 		</form>
 		<h2>Notes and Help</h2>
@@ -209,6 +179,8 @@ $i = 0;
 $posts = array();
 $feed = '';
 $allTags = array();
+$warnings = array();
+$markdown = false;
 
 # Tumblr Query Options:
 switch($_REQUEST["filter"]) {
@@ -219,6 +191,7 @@ switch($_REQUEST["filter"]) {
     case "none":
         # Do not post-process posts (leaves Markdown intact)
         $filter = "&filter=none";
+        $markdown = true;
         break;
     default:
         $filter = "";
@@ -230,16 +203,16 @@ switch($_REQUEST["filter"]) {
 # Permalink Format
 switch($_REQUEST["permaform"]) {
     case "combo":
-        # Do not post-process posts (leaves Markdown intact)
+        # ID and Hyphenated Title
         $permalink_format = "combined";
         break;
     case "text":
-        # Plaintext Content
+        # Title
         $permalink_format = "text";
         break;
     case "id":
     default:
-        # Plaintext Content
+        # Id only
         $permalink_format = "id";
         break;
 }
@@ -272,14 +245,21 @@ else {
 }
 
 # OK. Query the Tumblr API for the posts and get them all in 50-post batches:
-do {
-	$url = 'http://'.$username.'.tumblr.com/api/read?start='. $i . '&num=50' . $filter;
-	$file = file_get_contents($url);
-	$feed = new SimpleXMLElement($file);
-	$posts = array_merge($posts, $feed->xpath('posts//post'));
-	$i = (int)$feed->posts->attributes()->start + 50;
-} while($i <= (int)$feed->posts["total"]);
-
+try {
+    do {
+    	$url = 'http://'.$username.'.tumblr.com/api/read?start='. $i . '&num=50' . $filter;
+    	$file = file_get_contents($url);
+    	$feed = new SimpleXMLElement($file);
+    	$posts = array_merge($posts, $feed->xpath('posts//post'));
+    	$i = (int)$feed->posts->attributes()->start + 50;
+    } while($i <= (int)$feed->posts["total"]);
+}
+catch(Exception $e) {
+    echo "<h1>Error fetching Tumblr posts</h1>";
+    echo "<p>" . $e->getMessage() . "</p>";
+    echo "<p>$i posts fetched</p>";
+    die();
+}
 function formatForWP($str)
 {
 	global $type;
@@ -391,15 +371,9 @@ function formatEntryTitle(&$text, $strip=true) {
             # we want to strip out the link mark-up…
 
             # If raw input:
-            if('none' == $_REQUEST["filter"]) {
+            if($markdown) {
                 # Run markdown:
-                if(file_exists("markdown.php")) {
-                    require_once("markdown.php");
-                    $l = Markdown($l);
-                }
-                else {
-                    error_log("Couldn't import Markdown parser");
-                }
+                $l = Markdown($l);
             }
             # Crudely check for <a>
             $contains_link = !(false === stripos('<a', $l));
@@ -409,17 +383,15 @@ function formatEntryTitle(&$text, $strip=true) {
                 # If there has been no other content so far (allowing one block
                 # for quote attribution), and we're stripping titles out of the
                 # text to avoid duplication, do it:
-                $lines = array_splice($lines, $i, 1);
-                $text = implode('\n', $lines);
+                array_splice($lines, $i, 1);
+                $text = implode("\n", $lines);
             }
 
             # In the final return, strip not-inline HTML tags.
-            return str_replace('\n', '', strip_tags(
-                $l,
-                '<abbr><acronym><i><b><strong><em><code><kbd><samp><span><q>
-                 <cite><dfn><ins><del><mark><meter><rp><rt><ruby><sub><sup>
-                 <time><var>'
-            ));
+            return str_replace('\n', '', strip_tags($l));
+            #'<abbr><acronym><i><b><strong><em><code><kbd><samp><span><q>
+            # <cite><dfn><ins><del><mark><meter><rp><rt><ruby><sub><sup>
+            # <time><var>'
         }
         else {
             $block_count++;
@@ -431,6 +403,43 @@ function formatEntryTitle(&$text, $strip=true) {
         }
     }
     return '';
+}
+
+# Check if a media URL is hosted on Tumblr's server and record
+# a warning if so.
+function checkMediaForWarnings($media_url, $post, $type) {
+	global $warnings;
+	if(false !== stripos($media_url, 'tumblr.com')) {
+	    # Audio file is hosted on Tumblr, and won't be accessible.
+        $warnings[] = array(
+            'url' => $post,
+            'error' => "Post references a $type file hosted on
+ Tumblr.com. This file will not be accessible
+ from a post hosted on your own site. You need to host
+ `{$media_url}`
+ elsewhere and update the post."
+        );
+	}
+}
+
+function getWarnings() {
+	global $warnings;
+    if(!empty($warnings)):
+    ?>
+<!-- Warnings: -->
+<!-- The following warnings were recorded when exporting your Tumblr posts, -->
+<!-- and may require attention and manual intervention to full restore  -->
+<!-- your posts. -->
+
+    <?php
+        foreach($warnings as $id=>$data) {
+            echo <<<WARNING
+<!-- Warning for: {$data['url']} -->
+<!-- {$data['error']} -->
+
+WARNING;
+        }
+    endif;
 }
 
 header('content-type: text/xml');
@@ -476,8 +485,9 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 		<wp:category_parent></wp:category_parent>
 		<wp:cat_name><![CDATA[Uncategorized]]></wp:cat_name>
 	</wp:category>
+
 <?php
-ob_start();
+    ob_start();
 	foreach($posts as $post)
 	{
 ?>
@@ -514,11 +524,10 @@ ob_start();
 
 			case "photo":
 			$post_content = $post->{'photo-caption'};
-
 			?>
 	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
-		<content:encoded><![CDATA[<img src="<?php echo $post->{'photo-url'} ?>" alt=""/>
+		<content:encoded><![CDATA[<img src="<?php echo $post->{'photo-url'} ?>" alt="">
 
 		<?php echo formatForWP($post_content) ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'photo-caption'}) ?></wp:post_name>
@@ -527,10 +536,19 @@ ob_start();
 
 			case "quote":
 			$post_content = $post->{'quote-source'};
+
+			# Mark-up the quote:
+            if($markdown) {
+                # Add Markdown quotes, and hard line-breaks
+                $quote_text = "> " . str_replace("\n", "  \n> ", $post->{'quote-text'}) . "\n";
+            }
+            else {
+                $quote_text = "<blockquote>" . $post->{'quote-text'} . "</blockquote>";
+            }
 		?>
 	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
-		<content:encoded><![CDATA[<blockquote><?php echo $post->{'quote-text'} ?></blockquote>
+		<content:encoded><![CDATA[<?php echo $quote_text ?>
 
 		<?php echo formatForWP($post_content) ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, str_replace('&#8220;','',str_replace('&#8221;','',$post->{'quote-text'}))) ?></wp:post_name>
@@ -540,25 +558,27 @@ ob_start();
 			case "link": ?>
 	 	<title><?php echo htmlspecialchars(strip_tags($post->{'link-text'})) ?></title>
 		<description><?php echo htmlspecialchars(strip_tags($post->{'link-description'})) ?></description>
-		<content:encoded><![CDATA[<a href="<?php echo $post->{'link-url'} ?>"><?php echo $post->{'link-text'} ?></a>
+		<content:encoded><![CDATA[Link: <a href="<?php echo $post->{'link-url'} ?>"><?php echo $post->{'link-text'} ?></a>
 
 		<?php echo formatForWP($post->{'link-description'}) ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'link-text'}) ?></wp:post_name>
 <?php
 			break;
 
-
 		    case "conversation": ?>
 	 	<title><?php echo htmlspecialchars(strip_tags($post->{'conversation-title'})) ?></title>
 		<description></description>
 		<content:encoded><![CDATA[<?php
-		    foreach($post->{'conversation-line'} as $line) { ?>
-		        <cite><?php echo $line->attributes()->label ?></cite>
-		        <q><?php echo $line ?></q><br/><?php } ?>]]></content:encoded>
+		    foreach($post->{'conversation-line'} as $line) {
+		        ?><cite><?php
+		            echo ($markdown) ? preg_replace('/(<\/?p>|\n)/', '', Markdown($line->attributes()->label)) : $line->attributes()->label
+		        ?></cite> <q><?php
+		            echo ($markdown) ? preg_replace('/(<\/?p>|\n)/', '', Markdown($line)) : $line;
+		        ?></q><br>
+		    <?php } ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'conservation-title'}) ?></wp:post_name>
 <?php
 			break;
-
 
 			case "video":
 			$post_content = $post->{'video-caption'};
@@ -583,6 +603,7 @@ ob_start();
 			case "audio":
 			$post_content = $post->{'audio-caption'};
 			$audio_file = preg_match('/audio_file=([\S\s]*?)(&|")/', $post->{'audio-player'}, $matches);
+            checkMediaForWarnings($matches[1], $post->attributes()->url, "audio");
 		?>
 	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
@@ -599,6 +620,7 @@ ob_start();
 	}
 	$out = ob_get_contents();
 	ob_end_clean();
+	getWarnings();
 	getAllTags();
 	echo $out;
 ?>

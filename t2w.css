@@ -1,0 +1,40 @@
+body {
+    max-width: 40em;
+    font: 100%/150% Helvetica, Arial, sans-serif;
+}
+h1 {
+    font-size: 130%;
+    line-height: 150%;
+}
+dl {
+    font-size: 80%;
+}
+dt {
+    font-weight: bold;
+}
+form {
+    margin: 5px 0;
+    padding: 0;
+}
+fieldset {
+    border: 0;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    background-color: #eee;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#fff));
+    border: 3px #2D4261 solid;
+    padding: 5px 15px;
+}
+legend {
+    font-weight: bold;
+    padding-top: 2.5em;
+    margin-left: -2px;
+}
+fieldset ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+p.donate {
+    font-size: 80%;
+}

@@ -46,3 +46,14 @@ This work is licensed under the GPL v3 <http://www.gnu.org/licenses/gpl.html>
   * BUGFIX: Audio links now have text 'Audio'. Caption follows below. This
     prevents nesting problems if the caption itself contains links elsewhere,
     or block elements.
+  * Including Markdown processor to handle mark-up of conversations and title-
+    extraction.
+  * Links are prefixed with "Link:", to differentiate the content from post
+    titles. Wordpress will (by default) always link to the new posts
+    permalink from the title.
+
+## Known Issues
+
+  * Doesn't support Tumblr's new multiple-photos-per-post feature
+  * Wordpress.com does not import the HTML5 <audio> element
+  * Wordpress.com does not import any <embed> or <object> mark-up for videos.
