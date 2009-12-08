@@ -32,10 +32,10 @@ This work is licensed under the GPL v3 <http://www.gnu.org/licenses/gpl.html>
   * Refactored the input page mark-up. HTML5, richer form semantics.
   * Refactored the RSS output. No-longer repeats XML elements that are the
     same for all post types.
-  * Improved the output mark-up for conversation posts. Now uses <cite> and
-    <q>, rather than <strong> and nothing.
+  * Improved the output mark-up for conversation posts. Now uses `<cite>` and
+    `<q>`, rather than `<strong>` and nothing.
   * Improved the output mark-up for quotes. Quotes is now wrapped in a
-    <blockquote> element.
+    `<blockquote>` element.
   * Page header now includes project details, shared author attribution,
     and so forth.
   * Added inline help documentation for why fixing your redirects is useful.
@@ -55,5 +55,5 @@ This work is licensed under the GPL v3 <http://www.gnu.org/licenses/gpl.html>
 ## Known Issues
 
   * Doesn't support Tumblr's new multiple-photos-per-post feature
-  * Wordpress.com does not import the HTML5 <audio> element
-  * Wordpress.com does not import any <embed> or <object> mark-up for videos.
+  * Wordpress.com does not import the HTML5 `<audio>` element
+  * Wordpress.com does not import any `<embed>` or `<object>` mark-up for videos.
