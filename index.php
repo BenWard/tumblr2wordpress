@@ -1,6 +1,6 @@
 <?php
 
-define(T2W_VERSION, '0.3-benward');
+define(T2W_VERSION, '0.3.1-benward');
 
 # Some pieces of content will have to be parsed into HTML where we have to add
 # HTML strucutre (e.g. around conversations)
