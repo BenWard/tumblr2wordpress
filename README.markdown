@@ -1,19 +1,21 @@
 # Tumblr2Wordpress
 
-Tumblr2Wordpress is a PHP script to take posts from Tumblr and export them in
-the extended RSS format that Wordpress uses for full-data input/export.
+Tumblr2Wordpress is a PHP script to take posts from Tumblr and export them in the extended RSS format that Wordpress uses for full-data input/export.
 
-It allows you to take your posts, categories and tags from Tumblr and move
-them to Wordpress. Some amount of configuration of publication state and post
-state is supported, as well as control over processing of Markdown syntax
-on the Tumblr side.
+It allows you to take your posts, categories and tags from Tumblr and move them to Wordpress. Some amount of configuration of publication state and post state is supported, as well as control over processing of Markdown syntax on the Tumblr side.
 
-Tumblr2Wordpress is a project by Hao Chen <http://haochen.me/>, and you can
-find the core development at <http://code.google.com/p/tumblr2wordpress/>.
+Tumblr2Wordpress is originally a project by Hao Chen <http://haochen.me/>, and you can find that branch of work at <http://code.google.com/p/tumblr2wordpress/>.
 
 This work is licensed under the GPL v3 <http://www.gnu.org/licenses/gpl.html>
 
 ## Change Log
+
+### Version 0.3.1-benward
+
+  * HOTFIX: Switching Tumblr API requests to use curl rather than
+    `file_get_contents`, which hopefully fixes the API/XML parsing errors that
+    people have been reporting, but if not, will return much much better
+    debugging info for a future fix.
 
 ### Version 0.3-benward
 
@@ -56,4 +58,5 @@ This work is licensed under the GPL v3 <http://www.gnu.org/licenses/gpl.html>
 
   * Doesn't support Tumblr's new multiple-photos-per-post feature
   * Wordpress.com does not import the HTML5 `<audio>` element
-  * Wordpress.com does not import any `<embed>` or `<object>` mark-up for videos.
+  * Wordpress.com does not import any `<embed>` or `<object>` mark-up for
+    videos.

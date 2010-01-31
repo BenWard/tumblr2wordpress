@@ -1,6 +1,6 @@
 <?php
 
-define(T2W_VERSION, '0.3-benward');
+define(T2W_VERSION, '0.3.1-benward');
 
 # Some pieces of content will have to be parsed into HTML where we have to add
 # HTML strucutre (e.g. around conversations)
@@ -248,16 +248,62 @@ else {
 try {
     do {
     	$url = 'http://'.$username.'.tumblr.com/api/read?start='. $i . '&num=50' . $filter;
-    	$file = file_get_contents($url);
-    	$feed = new SimpleXMLElement($file);
+
+    	if(function_exists("curl_init")) {
+
+    	    $ch = curl_init();
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_USERAGENT, TL_USERAGENT);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); # Follow 301/302
+            curl_setopt($ch, CURLOPT_POST, 0);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            $data = curl_exec($ch);
+            $curl_info = curl_getinfo($ch);
+
+            if(200 != $curl_info['http_code']) {
+                # Some kind of error. Just debug output for now:
+                header("500", true, 500);
+                echo "<title>Tumblr2Wordpress Error</title>\n";
+                echo "<h1>Tumblr API Request Failed</h1>\n";
+                echo "<p>Requesting a set of posts from the Tumblr API failed.
+                See below for debugging output.</p>\n";
+                echo "<dl>\n";
+                echo "\t<dt>Error was</dt>\n\t<dd><code>" . $status_code . "</code></dd>\n";
+                echo "\t<dt>Request URL</dt>\n\t<dd><code>" . $url . "</code></dd>\n";
+                echo "\t<dt>Posts fetched (so far)</dt>\n\t<dd><code>" . $i . "</code></dd>\n";
+                echo "\t<dt>Last API response</dt>\n\t<dd><pre><code>" . htmlspecialchars($data) . "</code></pre></dd>\n";
+                echo "\t<dt>Curl Info</dt>\n\t<dd><pre><code>";
+                print_r($curl_info);
+                echo "</code></pre></dd>\n";
+                echo "</dl>";
+                die();
+            }
+
+            curl_close($ch);
+    	}
+    	else {
+
+    	    $data = file_get_contents($url);
+
+    	}
+
+    	$feed = new SimpleXMLElement($data);
     	$posts = array_merge($posts, $feed->xpath('posts//post'));
     	$i = (int)$feed->posts->attributes()->start + 50;
     } while($i <= (int)$feed->posts["total"]);
 }
 catch(Exception $e) {
-    echo "<h1>Error fetching Tumblr posts</h1>";
-    echo "<p>" . $e->getMessage() . "</p>";
-    echo "<p>$i posts fetched</p>";
+    header("500", true, 500);
+    echo "<title>Tumblr2Wordpress Error</title>\n";
+    echo "<h1>Error fetching Tumblr posts</h1>\n";
+    echo "<p>Something went wrong whilst collecting posts from the Tumblr API,
+    see below for debugging output.</p>\n";
+    echo "<dl>\n";
+    echo "\t<dt>Error was</dt>\n\t<dd><code>" . $e->getMessage() . "</code></dd>\n";
+    echo "\t<dt>Request URL</dt>\n\t<dd><code>" . $url . "</code></dd>\n";
+    echo "\t<dt>Posts fetched (so far)</dt>\n\t<dd><code>" . $i . "</code></dd>\n";
+    echo "\t<dt>Last API response</dt>\n\t<dd><pre><code>" . htmlspecialchars($data) . "</code></pre></dd>\n";
+    echo "</dl>";
     die();
 }
 function formatForWP($str)
