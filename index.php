@@ -255,9 +255,17 @@ try {
     } while($i <= (int)$feed->posts["total"]);
 }
 catch(Exception $e) {
-    echo "<h1>Error fetching Tumblr posts</h1>";
-    echo "<p>" . $e->getMessage() . "</p>";
-    echo "<p>$i posts fetched</p>";
+    header("500", true, 500);
+    echo "<title>Tumblr2Wordpress Error</title>\n";
+    echo "<h1>Error fetching Tumblr posts</h1>\n";
+    echo "<p>Something went wrong whilst collecting posts from the Tumblr API,
+    see below for debugging output.</p>\n";
+    echo "<dl>\n";
+    echo "\t<dt>Error was</dt>\n\t<dd><code>" . $e->getMessage() . "</code></dd>\n";
+    echo "\t<dt>Request URL</dt>\n\t<dd><code>" . $url . "</code></dd>\n";
+    echo "\t<dt>Posts fetched (so far)</dt>\n\t<dd><code>" . $i . "</code></dd>\n";
+    echo "\t<dt>Last API response</dt>\n\t<dd><pre><code>" . $file . "</code></pre></dd>\n";
+    echo "</dl>";
     die();
 }
 function formatForWP($str)
