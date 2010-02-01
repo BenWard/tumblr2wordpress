@@ -451,11 +451,33 @@ function formatEntryTitle(&$text, $strip=true) {
     return '';
 }
 
+# Use curl follow-location to resolve 30* redirects to the canonical URL:
+# Use this to find whether media is hosted on the Tumblr server or at a
+# public location.
+function resolveRedirects($url) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_USERAGENT, TL_USERAGENT);
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+    curl_setopt($ch, CURLOPT_HEADER, true);
+    curl_setopt($ch, CURLOPT_NOBODY, true);
+    curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+    curl_exec($ch);
+    $rsp = curl_getinfo($ch);
+    curl_close($ch);
+    return $rsp['url'];
+}
+
 # Check if a media URL is hosted on Tumblr's server and record
 # a warning if so.
 function checkMediaForWarnings($media_url, $post, $type) {
 	global $warnings;
-	if(false !== stripos($media_url, 'tumblr.com')) {
+
+	$resolved_url = resolveRedirects($media_url);
+
+	if(false !== stripos($resolved_url, 'tumblr.com')) {
 	    # Audio file is hosted on Tumblr, and won't be accessible.
         $warnings[] = array(
             'url' => $post,
