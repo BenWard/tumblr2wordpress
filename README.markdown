@@ -10,6 +10,10 @@ This work is licensed under the GPL v3 <http://www.gnu.org/licenses/gpl.html>
 
 ## Change Log
 
+### Version 0.4-benward
+
+  * Added support for Tumblr photosets (where multiple photographs are added to a single post.)
+
 ### Version 0.3.1-benward
 
   * HOTFIX: Switching Tumblr API requests to use curl rather than
