@@ -592,11 +592,31 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 
 			case "photo":
 			$post_content = $post->{'photo-caption'};
+			$image = "";
+
+			# Handle photosets vs. single photos
+			# HTML5 `figure` is unstable, so just use class names on HTML4 now.
+			if(isset($post->photoset)) {
+			    foreach($post->xpath('photoset//photo') as $photo) {
+			        $image .= "\n\t\t\t<div class=\"figure\">\n";
+			        $image .= "\t\t\t\t<img src=\"{$photo->{'photo-url'}}\" alt=\"\">\n";
+		            if(!empty($photo->attributes()->caption)) {
+		                $image .= "\t\t\t\t<p class=\"legend\">{$photo->attributes()->caption}</p>\n";
+		            }
+		            $image .= "\t\t\t</div>\n";
+			    }
+			}
+			else {
+			    $image = <<<FIGURE
+		        <div class="figure">
+		            <img src="{$post->{'photo-url'}}" alt="">
+		        </div>\n\n
+FIGURE;
+            }
 			?>
 	 	<title><?php echo htmlspecialchars(formatEntryTitle(&$post_content)) ?></title>
 		<description></description>
-		<content:encoded><![CDATA[<img src="<?php echo $post->{'photo-url'} ?>" alt="">
-
+		<content:encoded><![CDATA[<?php echo $image; ?>
 		<?php echo formatForWP($post_content) ?>]]></content:encoded>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'photo-caption'}) ?></wp:post_name>
 <?php
