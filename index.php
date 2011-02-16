@@ -567,7 +567,7 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 		<dc:creator><![CDATA[post_author]]></dc:creator>
 		<?php getTags($post) ?>
 		<guid isPermaLink="false"><?php echo $post->attributes()->url ?></guid>
-		<wp:post_id><?php echo $post->attributes()->id ?></wp:post_id>
+		<!--<wp:post_id><?php echo $post->attributes()->id ?></wp:post_id>-->
 		<wp:post_date><?php echo date('Y-m-d G:i:s', (double)$post->attributes()->{'unix-timestamp'}) ?></wp:post_date>
 		<wp:post_date_gmt><?php echo str_replace(" GMT", "", $post->attributes()->{'date-gmt'}) ?></wp:post_date_gmt>
 		<wp:comment_status><?php echo $comments ?></wp:comment_status>
