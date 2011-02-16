@@ -1,6 +1,6 @@
 <?php
 
-define(T2W_VERSION, '0.3.1-benward');
+define(T2W_VERSION, '0.4');
 
 # Some pieces of content will have to be parsed into HTML where we have to add
 # HTML strucutre (e.g. around conversations)
@@ -14,7 +14,8 @@ if(empty($username)): ?>
 <html lang="en">
 	<head>
 	    <meta charset="utf-8">
-		<title>Tumblr2WordPress: Export Your Tumblr To WordPress</title>
+		<title>Tumblr2WordPress: Export Your Tumblr Blog To WordPress RSS</title>
+		<link rel="profile" href="http://microformats.org/profile/hcard">
 		<link rel="stylesheet" href="t2w.css" type="text/css">
 	</head>
 	<body>
@@ -537,11 +538,10 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:wp="http://wordpress.org/export/1.0/"
 >
-
 <channel>
-	<title><?php echo $feed->tumblelog->attributes()->title ?></title>
+	<title><?php echo htmlspecialchars($feed->tumblelog->attributes()->title) ?></title>
 	<link>http://<?php echo $feed->tumblelog->attributes()->name ?>.tumblr.com/</link>
-	<description><?php echo $feed->tumblelog ?></description>
+	<description><?php echo htmlspecialchars($feed->tumblelog) ?></description>
 	<pubDate><?php echo date("r") ?></pubDate>
 	<generator>http://<?php echo 'Tumblr2Wordpress/' . T2W_VERSION . '(' . $_SERVER['HTTP_HOST'] . ')' ?></generator>
 	<language>en</language>
@@ -568,7 +568,7 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 		<dc:creator><![CDATA[post_author]]></dc:creator>
 		<?php getTags($post) ?>
 		<guid isPermaLink="false"><?php echo $post->attributes()->url ?></guid>
-		<wp:post_id><?php echo $post->attributes()->id ?></wp:post_id>
+		<!--<wp:post_id><?php echo $post->attributes()->id ?></wp:post_id>-->
 		<wp:post_date><?php echo date('Y-m-d G:i:s', (double)$post->attributes()->{'unix-timestamp'}) ?></wp:post_date>
 		<wp:post_date_gmt><?php echo str_replace(" GMT", "", $post->attributes()->{'date-gmt'}) ?></wp:post_date_gmt>
 		<wp:comment_status><?php echo $comments ?></wp:comment_status>
@@ -595,22 +595,22 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 			$image = "";
 
 			# Handle photosets vs. single photos
-			# HTML5 `figure` is unstable, so just use class names on HTML4 now.
+			# Using combined HTML5 + classes shim:
 			if(isset($post->photoset)) {
 			    foreach($post->xpath('photoset//photo') as $photo) {
-			        $image .= "\n\t\t\t<div class=\"figure\">\n";
+			        $image .= "\n\t\t\t<div class=\"figure\"><figure>\n";
 			        $image .= "\t\t\t\t<img src=\"{$photo->{'photo-url'}}\" alt=\"\">\n";
 		            if(!empty($photo->attributes()->caption)) {
-		                $image .= "\t\t\t\t<p class=\"legend\">{$photo->attributes()->caption}</p>\n";
+		                $image .= "\t\t\t\t<p class=\"figcaption\"><figcaption>{$photo->attributes()->caption}</figcaption></p>\n";
 		            }
-		            $image .= "\t\t\t</div>\n";
+		            $image .= "\t\t\t</figure></div>\n";
 			    }
 			}
 			else {
 			    $image = <<<FIGURE
-		        <div class="figure">
+		        <div class="figure"><figure>
 		            <img src="{$post->{'photo-url'}}" alt="">
-		        </div>\n\n
+		        </figure></div>\n\n
 FIGURE;
             }
 			?>
@@ -680,10 +680,9 @@ FIGURE;
 		[googlevideo=<?php preg_match('/src="([\S\s]*?)"/', $post->{'video-player'}, $matches); echo $matches[1]; ?>]
         <?php } else { ?>
 	    <?php echo $post->{'video-player'} ?>
-
+        <?php } ?>
 	    <?php echo $post_content ?>
 	    ]]></content:encoded>
-        <?php } ?>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'video-caption'}) ?></wp:post_name>
 <?php
 			break;
