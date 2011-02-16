@@ -680,10 +680,9 @@ FIGURE;
 		[googlevideo=<?php preg_match('/src="([\S\s]*?)"/', $post->{'video-player'}, $matches); echo $matches[1]; ?>]
         <?php } else { ?>
 	    <?php echo $post->{'video-player'} ?>
-
+        <?php } ?>
 	    <?php echo $post_content ?>
 	    ]]></content:encoded>
-        <?php } ?>
 		<wp:post_name><?php echo formatPermalinkSlug($post->attributes()->id, $post->{'video-caption'}) ?></wp:post_name>
 <?php
 			break;
