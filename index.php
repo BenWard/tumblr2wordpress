@@ -537,11 +537,10 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:wp="http://wordpress.org/export/1.0/"
 >
-
 <channel>
-	<title><?php echo $feed->tumblelog->attributes()->title ?></title>
+	<title><?php echo htmlspecialchars($feed->tumblelog->attributes()->title) ?></title>
 	<link>http://<?php echo $feed->tumblelog->attributes()->name ?>.tumblr.com/</link>
-	<description><?php echo $feed->tumblelog ?></description>
+	<description><?php echo htmlspecialchars($feed->tumblelog) ?></description>
 	<pubDate><?php echo date("r") ?></pubDate>
 	<generator>http://<?php echo 'Tumblr2Wordpress/' . T2W_VERSION . '(' . $_SERVER['HTTP_HOST'] . ')' ?></generator>
 	<language>en</language>
