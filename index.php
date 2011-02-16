@@ -14,7 +14,8 @@ if(empty($username)): ?>
 <html lang="en">
 	<head>
 	    <meta charset="utf-8">
-		<title>Tumblr2WordPress: Export Your Tumblr To WordPress</title>
+		<title>Tumblr2WordPress: Export Your Tumblr Blog To WordPress RSS</title>
+		<link rel="profile" href="http://microformats.org/profile/hcard">
 		<link rel="stylesheet" href="t2w.css" type="text/css">
 	</head>
 	<body>
