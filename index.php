@@ -598,19 +598,19 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
 			# Using combined HTML5 + classes shim:
 			if(isset($post->photoset)) {
 			    foreach($post->xpath('photoset//photo') as $photo) {
-			        $image .= "\n\t\t\t<div class=\"figure\"><figure>\n";
-			        $image .= "\t\t\t\t<img src=\"{$photo->{'photo-url'}}\" alt=\"\">\n";
+			        $image .= "\n<div class=\"figure\"><figure>\n";
+			        $image .= "  <img src=\"{$photo->{'photo-url'}}\" alt=\"\">\n";
 		            if(!empty($photo->attributes()->caption)) {
-		                $image .= "\t\t\t\t<p class=\"figcaption\"><figcaption>{$photo->attributes()->caption}</figcaption></p>\n";
+		                $image .= "  <p class=\"figcaption\"><figcaption>{$photo->attributes()->caption}</figcaption></p>\n";
 		            }
-		            $image .= "\t\t\t</figure></div>\n";
+		            $image .= "</figure></div>\n";
 			    }
 			}
 			else {
 			    $image = <<<FIGURE
-		        <div class="figure"><figure>
-		            <img src="{$post->{'photo-url'}}" alt="">
-		        </figure></div>\n\n
+<div class="figure"><figure>
+  <img src="{$post->{'photo-url'}}" alt="">
+</figure></div>\n\n
 FIGURE;
             }
 			?>
