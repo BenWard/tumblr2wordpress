@@ -389,6 +389,7 @@ function getAllTags()
 }
 
 function formatPermalinkSlug($id, $text) {
+	global $permalink_format;
     switch($permalink_format) {
         case 'combo':
             return $id . '-' . removeWeirdChars($text);
