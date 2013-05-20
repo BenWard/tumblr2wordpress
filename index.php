@@ -20,17 +20,19 @@ if(empty($username)): ?>
   </head>
   <body>
     <h1>Tumblr2WordPress: Export Your Tumblr to WordPress</h1>
-    <dl>
+
+    <p>This tool will create a WordPress compatible XML file from your
+        Tumblr blog, which you can then save and import into WordPress.</p>
+
+    <dl class="about">
       <dt>Version</dt>
       <dd><?php echo T2W_VERSION ?></dd>
       <dt>Author</dt>
-      <dd class="vcard">
-          Originally by
-          <a class="fn url" href="http://haochen.me/">Hao Chen</a>
+      <dd>Originally by
+          <a class="h-card" href="http://haochen.me/">Hao Chen</a>
       </dd>
-      <dd class="vcard">
-          This version by
-          <a class="fn url" href="http://benward.me">Ben Ward</a>
+      <dd>This version by
+          <a class="h-card" href="http://benward.me">Ben Ward</a>
       </dd>
       <dt>License</dt>
       <dd><a rel="license" href="http://www.gnu.org/licenses/gpl.html">GPL v3</a></dd>
@@ -38,8 +40,58 @@ if(empty($username)): ?>
       <dd><a href="http://github.com/benward/tumblr2wordpress">
           github.com/benward/tumblr2wordpress</a></dd>
     </dl>
-    <p>This tool will create a WordPress compatible XML file from your
-        Tumblr blog, which you can then save and import into WordPress.</p>
+
+    <div class="yahoo">
+      <h2>Welcome, fear-stricken Tumblr friend!</h2>
+      <p>Good morning! By now you'll have
+        <a href="http://www.guardian.co.uk/technology/2013/may/19/yahoo-poised-buy-tumblr">heard the news</a>—or be frantically responding
+        to the rumour thereof—that Tumblr is selling to Yahoo for a gigantic pot
+        of money. Congratulations to them, you may think, followed by a spinal chill
+        of panic as your mind harks back to the bloodied fates of previous Yahoo acquisitions:
+        Geocities, Upcoming, Delicious…</p>
+      <p>Firstly, don't panic. No matter what anyone is saying on the internet,
+        it's very unlikely that anything will change suddenly; that's not how
+        these things work. Plus, Yahoo's intentions will be for Tumblr to be a
+        success, and it's under new management, so you never know, it might work
+        out. Still, regardless of what happens to the services we love in the future,
+        it is <em>always</em> smart to have back-ups, so hopefully this tool
+        can help you, whether you want to jump ship for WordPress, or just have
+        some piece of mind.</p>
+      <p>There are a few things that you should note:</p>
+      <ul>
+        <li>This tool is <em>old</em>. It was written a few years ago when I intended
+          to merge my Tumblr into a WordPress install. I never did it, and the tool
+          is a little incomplete as a result. It's still here, though.</li>
+        <li>The tool was written before Tumblr had support for multiple image
+          uploads, so if you do a lot of that you might not get the full export
+          you're hoping for.</li>
+        <li>The tool was also written before WordPress introduced their own concept
+          of top-level post types: Photos, Quotes, Video posts, etc. All posts from
+          this tool will be appropriately categorised, but maybe not quite as
+          cleverly as newer WordPress tools. You might want to consider the
+          <a href="http://wordpress.org/plugins/tumblr-importer/">Tumblr Importer</a>
+          plugin for WordPress instead.</li>
+        <li>The tool will give you some highly pedantic and slightly opinionated
+          HTML5 output. Which is all good. And it will attempt to coerce Audio
+          into an HTML5 audio player too. The actual file may or may not work in
+          this form, depending on the original source.</li>
+        <li>Posts with images will still reference the images on Tumblr's servers.
+          If you want to copy the images to your server as well you'll either need
+          to run another script, or install a WordPress plugin such as
+          Milan Dinicć's <a href="http://blog.milandinic.com/wordpress/plugins/cache-images/">Cache
+          Images</a> plugin.</li>
+      </ul>
+      <p>All that being said, you might still find the tool useful, and I hope you do.
+        The code was originally written by <a class="h-card" href="http://haochen.me/">Hao Chen</a>,
+        and was substantially updated by me, <a class="h-card" href="http://benward.me">Ben Ward</a>.
+      </p>
+
+      <p>The source code (which, I cannot stress enough, is very old now) is
+        <a href="http://github.com/benward/tumblr2wordpress">on Github</a>,
+        if you'd like to run your own copy or make changes.</p>
+    </div>
+
+
     <form method="POST" action="">
 
     <fieldset>
