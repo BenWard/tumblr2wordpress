@@ -213,9 +213,6 @@ if(empty($username)): ?>
           <pre><code>RewriteEngine On
 RewriteRule ^/?posts/([0-9]+).*$ http://wordpress.example.com/blog/$1</code></pre>
         </div>
-    <p class="donate">If you find this tool useful, consider dropping a tip
-        to Hao Chen, who wrote the original version of the script. Find his
-        version at <a href="http://haochen.me/tumblr/">http://haochen.me/tumblr/</a>
     </p>
   </body>
 </html>
