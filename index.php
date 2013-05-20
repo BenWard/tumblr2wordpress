@@ -96,8 +96,8 @@ if(empty($username)): ?>
 
     <fieldset>
         <legend>Tumblr Account</legend>
-        <label for="tumblr-user">Tumblr Blog URL (not your email address or custom domain):</label>
-        <input type="text" id="tumblr-user" name="username" size="40">
+        <label for="tumblr-user">Tumblr Blog URL (Your username; not your email address or custom domain):</label>
+        <input type="text" id="tumblr-user" name="username" size="40" placeholder="username">
         <samp>.tumblr.com</samp>
     </fieldset>
     <fieldset>
@@ -119,7 +119,7 @@ if(empty($username)): ?>
     <fieldset>
         <legend>Permalink Slugs</legend>
         <p>Here, choose the permalink format for the posts when they
-            are imported into Wordpress.</p>
+            are imported into WordPress.</p>
         <p>A reliable permalink may allow you to redirect content between
            your old and new site. <a href="#help-permalinks">Read more</a>.</p>
         <ul>
@@ -179,10 +179,10 @@ if(empty($username)): ?>
         </div>
       </fieldset>
       <fieldset>
-          <legend>Ready?</legend>
+        <legend>Ready?</legend>
         <input type="submit" value="Export">
         <p>After a short pause, your browser will download an XML file
-            containing your Tumblr posts, converted for use in Wordpress.
+            containing your Tumblr posts, converted for use in WordPress.
             You should open this file in a text editor to see the
             instructions on how to import your posts, and also check for
             any warnings the exporter has generated for your posts. For
@@ -197,7 +197,7 @@ if(empty($username)): ?>
             (<samp>yourdomain.com</samp> rather than <samp>me.tumblr.com</samp>,
             for example), then you can set up redirects from the old URLs that
             people are still linking to, to the imported post on your new
-            Wordpress blog.</p>
+            WordPress blog.</p>
         <p>Basically, where you have a Tumblr post URL that looks like this:
           <samp>http://example.com/post/12345678/this-is-a-post</samp>,
           the only part that matters is
@@ -316,7 +316,7 @@ try {
             if(200 != $curl_info['http_code']) {
                 # Some kind of error. Just debug output for now:
                 header("500", true, 500);
-                echo "<title>Tumblr2Wordpress Error</title>\n";
+                echo "<title>Tumblr2WordPress Error</title>\n";
                 echo "<h1>Tumblr API Request Failed</h1>\n";
                 echo "<p>Requesting a set of posts from the Tumblr API failed.
                 See below for debugging output.</p>\n";
@@ -347,7 +347,7 @@ try {
 }
 catch(Exception $e) {
     header("500", true, 500);
-    echo "<title>Tumblr2Wordpress Error</title>\n";
+    echo "<title>Tumblr2WordPress Error</title>\n";
     echo "<h1>Error fetching Tumblr posts</h1>\n";
     echo "<p>Something went wrong whilst collecting posts from the Tumblr API,
     see below for debugging output.</p>\n";
@@ -596,7 +596,7 @@ header("content-disposition: attachment; filename=tumblr_$username.xml");
   <link>http://<?php echo $feed->tumblelog->attributes()->name ?>.tumblr.com/</link>
   <description><?php echo htmlspecialchars($feed->tumblelog) ?></description>
   <pubDate><?php echo date("r") ?></pubDate>
-  <generator>http://<?php echo 'Tumblr2Wordpress/' . T2W_VERSION . '(' . $_SERVER['HTTP_HOST'] . ')' ?></generator>
+  <generator>http://<?php echo 'Tumblr2WordPress/' . T2W_VERSION . '(' . $_SERVER['HTTP_HOST'] . ')' ?></generator>
   <language>en</language>
   <wp:wxr_version>1.0</wp:wxr_version>
   <wp:base_site_url>http://<?php echo $feed->tumblelog->attributes()->name ?>.tumblr.com/</wp:base_site_url>
